@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+        <html>
+          <head>
+            <title data-id="th-modified">Web Page</title>
+            
+          <meta property="og:title" content="Web Page" data-id="th-modified" ><meta name="description" content="code" data-id="th-modified" ><meta property="og:description" content="code" data-id="th-modified" ><meta property="og:image" content="https://tiiny.host/assets/logo-purple-bg.png" data-id="th-modified" ><meta property="og:image:width" content="1501" data-id="th-modified" ><meta property="og:image:height" content="1501" data-id="th-modified" ><meta property="og:image:type" content="image/png" data-id="th-modified" ><meta property="og:url" content="https://teal-essa-2.tiiny.site/" data-id="th-modified" ><meta property="og:type" content="website" data-id="th-modified" ><script defer data-domain="teal-essa-2.tiiny.site" src="https://analytics.tiiny.net/js/plausible.js"></script><script type="text/javascript" src="https://tiiny.host/ad-script.js"></script></head>
+          <body>
+            <!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 20px;
+      background: #f3f6f4; color: #18231e;
+      font: 15px Arial, sans-serif;
+    }
+    .wrap { max-width: 1100px; margin: auto; }
+    h1 { margin: 0 0 6px; font-size: 25px; }
+    .sub { color: #64736b; margin-bottom: 20px; }
+    .card {
+      background: white; border-radius: 14px; padding: 18px;
+      margin-bottom: 16px; box-shadow: 0 3px 12px #18372b12;
+    }
+    .fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    label { display: block; font-weight: 700; margin-bottom: 6px; }
+    input, select {
+      width: 100%; padding: 11px; border: 1px solid #ccd6d0;
+      border-radius: 8px; font-size: 15px; background: white;
+    }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 950px; }
+    th, td { border-bottom: 1px solid #e4eae6; padding: 8px; text-align: left; }
+    th { background: #163b32; color: white; font-size: 13px; }
+    td input { min-width: 90px; padding: 8px; }
+    .item { font-weight: 700; }
+    .unit { color: #67756d; }
+    button {
+      border: 0; border-radius: 9px; padding: 13px 20px;
+      background: #16834b; color: white; font-weight: 700;
+      font-size: 16px; cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: wait; }
+    #status { margin-left: 12px; font-weight: 700; }
+    @media (max-width: 650px) {
+      body { padding: 12px; }
+      .fields { grid-template-columns: 1fr; }
+      h1 { font-size: 21px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Form Stok Harian</h1>
+  <div class="sub">Data yang disimpan akan masuk ke tab spreadsheet sesuai tanggal.</div>
+
+  <div class="card fields">
+    <div>
+      <label for="tanggal">Tanggal</label>
+      <input id="tanggal" type="date" required>
+    </div>
+    <div>
+      <label for="lokasi">Lokasi / Gudang</label>
+      <select id="lokasi">
+        <option value="">Pilih lokasi</option>
+        <option>GUDANG</option>
+        <option>VETERAN</option>
+        <option>MUNJUL</option>
+        <option>CIKAMPEK</option>
+        <option>BAR</option>
+      </select>
+    </div>
+    <div>
+      <label for="pic">Nama PIC</label>
+      <input id="pic" type="text" placeholder="Nama yang mengisi">
+    </div>
+  </div>
+
+  <div class="card table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>KATEGORI</th><th>NAMA BAHAN</th><th>SATUAN</th>
+          <th>STOCK MASUK</th><th>STOCK SISA MASUK</th>
+          <th>STOCK KELUAR</th><th>STOCK DIPOTONG</th>
+          <th>SUSUT KULIT</th><th>SISA STOCK TOKO</th>
+        </tr>
+      </thead>
+      <tbody id="items"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <button id="submit" onclick="kirim()">Simpan Data</button>
+    <span id="status"></span>
+  </div>
+</div>
+
+<script>
+  const daftarBahan = [
+    ['BAHAN BAKU UTAMA','MANGGA','KG'],
+    ['BAHAN BAKU UTAMA','ALPUKAT','KG'],
+    ['BAHAN BAKU UTAMA','STRAWBERRY','KG'],
+    ['BAHAN BAKU UTAMA','SUNKIST','PCS'],
+    ['BAHAN BAKU UTAMA','JERUK PERAS','PCS'],
+    ['BAHAN BAKU UTAMA','JAMBU','KG'],
+    ['BAHAN BAKU UTAMA','JAMBU POTONG','KG'],
+    ['BAHAN BAKU UTAMA','NANAS','KG'],
+    ['BAHAN BAKU UTAMA','NANAS POTONG','KG'],
+    ['BAHAN BAKU UTAMA','MELON','KG'],
+    ['BAHAN BAKU UTAMA','MELON POTONG','KG'],
+    ['BAHAN BAKU UTAMA','PISANG','KG'],
+    ['BAHAN BAKU UTAMA','NAGA','KG'],
+    ['BAHAN BAKU UTAMA','AIR KELAPA','LT'],
+    ['BAHAN PENDUKUNG','CREAMER','KG'],
+    ['BAHAN PENDUKUNG','GULA','KG'],
+    ['BAHAN PENDUKUNG','SKM','KG'],
+    ['PACKAGING','CUP SABLON','PCS'],
+    ['PACKAGING','PLASTIK PE','KG'],
+    ['PACKAGING','SEDOTAN CUP','PAK'],
+    ['PACKAGING','SEDOTAN SABLON','PAK'],
+    ['OTHER','THERMAL','GULUNG'],
+    ['OTHER','SEALER','GULUNG'],
+    ['OTHER','PE GIOK','IKET'],
+    ['OTHER','PE 15','IKET'],
+    ['OTHER','PE 25','IKET'],
+    ['OTHER','PE 50','IKET']
+  ];
+
+  const kolom = [
+    ['stockMasuk','Stock Masuk'],
+    ['sisaStockMasuk','Stock Sisa Masuk'],
+    ['stockKeluar','Stock Keluar'],
+    ['stockDipotong','Stock Dipotong'],
+    ['susutKulit','Susut Kulit'],
+    ['sisaStockToko','Sisa Stock Toko']
+  ];
+
+  const tbody = document.getElementById('items');
+
+  daftarBahan.forEach((b, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td>${b[0]}</td><td class="item">${b[1]}</td><td class="unit">${b[2]}</td>` +
+      kolom.map(k =>
+        `<td><input type="number" min="0" step="any"
+          data-index="${i}" data-key="${k[0]}" aria-label="${k[1]} ${b[1]}"></td>`
+      ).join('');
+    tbody.appendChild(tr);
+  });
+
+  // Tanggal awal otomatis hari ini.
+  const now = new Date();
+  document.getElementById('tanggal').value =
+    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+  function kirim() {
+    const tombol = document.getElementById('submit');
+    const status = document.getElementById('status');
+    const tanggal = document.getElementById('tanggal').value;
+    const lokasi = document.getElementById('lokasi').value;
+    const pic = document.getElementById('pic').value.trim();
+
+    if (!tanggal || !lokasi || !pic) {
+      status.textContent = 'Lengkapi tanggal, lokasi, dan PIC.';
+      status.style.color = '#b42318';
+      return;
+    }
+
+    const items = daftarBahan.map((b, i) => {
+      const item = { kategori: b[0], nama: b[1], satuan: b[2] };
+      kolom.forEach(k => {
+        const input = document.querySelector(
+          `input[data-index="${i}"][data-key="${k[0]}"]`
+        );
+        item[k[0]] = input.value;
+      });
+      return item;
+    });
+
+    tombol.disabled = true;
+    status.textContent = 'Menyimpan...';
+    status.style.color = '#555';
+
+    google.script.run
+      .withSuccessHandler(pesan => {
+        status.textContent = pesan;
+        status.style.color = '#16834b';
+        tombol.disabled = false;
+        document.querySelectorAll('tbody input').forEach(input => input.value = '');
+      })
+      .withFailureHandler(error => {
+        status.textContent = error.message || 'Terjadi kesalahan.';
+        status.style.color = '#b42318';
+        tombol.disabled = false;
+      })
+      .simpanData({ tanggal, lokasi, pic, items });
+  }
+</script>
+</body>
+</html>
+          </body>
+        </html>
